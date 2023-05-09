@@ -6,7 +6,7 @@
 #    By: aabel <aabel@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/24 11:37:47 by aabel             #+#    #+#              #
-#    Updated: 2023/04/24 15:26:19 by aabel            ###   ########.fr        #
+#    Updated: 2023/05/04 14:58:08 by aabel            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,6 +34,7 @@ $(NAME): $(OBJS_CLIENT) $(OBJS_SERVER)
 		@$(CC) -o server $(OBJS_SERVER) $(LIBFT_DIR)
 
 clean:
+		@make -C inc/libft_printf clean
 		@$(RM) $(OBJS_CLIENT) $(OBJS_SERVER)
 
 fclean: clean
