@@ -6,7 +6,7 @@
 /*   By: aabel <aabel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 14:28:37 by aabel             #+#    #+#             */
-/*   Updated: 2023/05/09 15:24:33 by aabel            ###   ########.fr       */
+/*   Updated: 2023/05/10 14:18:26 by aabel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,8 @@ void	error(int *bit, int *i, char *str)
 
 void	ft_reception(int sig, siginfo_t *info, void *context)
 {
-	static int	bit = 0;
-	static int	bit_len = 0;
-	static int	i = 0;
+	static int	bit = -1;
+	static int	bit_len = 1;
 	static char	*str = NULL;
 	static int	u = 0;
 
@@ -43,30 +42,35 @@ void	ft_reception(int sig, siginfo_t *info, void *context)
 		}
 	}
 	else if (bit_len > 32)
-	{
-		if (sig == SIGUSR2)
-			i = i | (0x01 << bit);
-		bit++;
-		if (bit == 8)
-		{
-			if (i >= 0x00 && i <= 0x7f)
-			{
-				str[((bit_len - 32) / 8) - 1] = i;
-			}
-			else
-				exit (0);
-			if (i == 0)
-			{
-				ft_printf("%s\n", str);
-				str = NULL;
-				free(str);
-				bit_len = 0;
-			}
-			bit = 0;
-			i = 0;
-		}
-	}
+		ft_reception_to_print(&bit_len, sig, &bit, str);
 	(usleep(50), kill(info->si_pid, SIGUSR2));
+}
+
+void	ft_reception_to_print(int *bit_len, int sig, int *bit, char *str)
+{
+	static int	i = 0;
+
+	if (sig == SIGUSR2)
+		i = i | (0x01 << (*bit));
+	(*bit)++;
+	if ((*bit) == 8)
+	{
+		if (i >= 0x00 && i <= 0x7f)
+		{
+			str[(((*bit_len) - 32) / 8) - 1] = i;
+		}
+		else
+			exit (0);
+		if (i == 0)
+		{
+			ft_printf("%s\n", str);
+			str = NULL;
+			free(str);
+			(*bit_len) = 0;
+		}
+		(*bit) = 0;
+		i = 0;
+	}
 }
 
 int	main(void)

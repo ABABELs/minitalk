@@ -6,7 +6,7 @@
 /*   By: aabel <aabel@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 11:35:22 by aabel             #+#    #+#             */
-/*   Updated: 2023/05/09 14:12:56 by aabel            ###   ########.fr       */
+/*   Updated: 2023/05/10 13:54:04 by aabel            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,13 +72,13 @@ int	main(int argc, char **argv)
 
 	i = 0;
 	u = 0;
+	if (argc != 3)
+		return (0);
 	pid = ft_atoi(argv[1]);
 	s_sigaction.sa_sigaction = confirmed;
 	s_sigaction.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &s_sigaction, 0);
 	sigaction(SIGUSR2, &s_sigaction, 0);
-	if (argc != 3)
-		return (0);
 	u = ft_strlen(argv[2]);
 	send_bit_32(pid, u);
 	while (argv[2][i])
