@@ -3,16 +3,43 @@
 /*                                                        :::      ::::::::   */
 /*   server.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aabel <aabel@student.42.fr>                +#+  +:+       +#+        */
+/*   By: arthurabel <arthurabel@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/24 14:28:37 by aabel             #+#    #+#             */
-/*   Updated: 2023/05/10 14:18:26 by aabel            ###   ########.fr       */
+/*   Updated: 2023/05/31 17:18:54 by arthurabel       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/minitalk.h"
 
-void	error(int *bit, int *i, char *str)
+char	*ft_strjoin_char(char *s1, char s2)
+{
+	int		sizetotal;
+	char	*chainjoin;
+	size_t	i;
+
+	i = -1;
+	if (s1 && s2)
+		sizetotal = ft_strlen(s1) + 1;
+	if (s1 && !s2)
+		sizetotal = ft_strlen(s1);
+	if (!s1 && s2)
+		sizetotal = 1;
+	chainjoin = malloc(sizeof(char) * (sizetotal + 1));
+	if (!chainjoin)
+		return (NULL);
+	if (s1)
+		while (++i < ft_strlen(s1))
+			chainjoin[i] = s1[i];
+	if (!s1)
+		i++;
+	if (s2)
+		chainjoin[i] = s2;
+	chainjoin[i + 1] = '\0';
+	return (chainjoin);
+}
+
+void	error(int *bit, char *i, char *str)
 {
 	*bit = 0;
 	*i = 0;
@@ -20,57 +47,33 @@ void	error(int *bit, int *i, char *str)
 		free(str);
 }
 
-void	ft_reception(int sig, siginfo_t *info, void *context)
+void	sigusr(int sig, siginfo_t *info, void *context)
 {
-	static int	bit = -1;
-	static int	bit_len = 1;
+	static int	bit = 0;
+	static char	i = 0;
 	static char	*str = NULL;
-	static int	u = 0;
 
 	(void) info;
 	(void) context;
-	bit_len++;
-	if (bit_len <= 32)
-	{
-		if (sig == SIGUSR2)
-			u = u | (0x0001 << bit_len);
-		if (bit_len == 32)
-		{
-			str = malloc(sizeof(char) * u);
-			str[u - 1] = 0;
-			bit_len++;
-		}
-	}
-	else if (bit_len > 32)
-		ft_reception_to_print(&bit_len, sig, &bit, str);
-	(usleep(50), kill(info->si_pid, SIGUSR2));
-}
-
-void	ft_reception_to_print(int *bit_len, int sig, int *bit, char *str)
-{
-	static int	i = 0;
-
 	if (sig == SIGUSR2)
-		i = i | (0x01 << (*bit));
-	(*bit)++;
-	if ((*bit) == 8)
+		i = i | (0x01 << bit);
+	bit++;
+	if (bit == 8)
 	{
-		if (i >= 0x00 && i <= 0x7f)
-		{
-			str[(((*bit_len) - 32) / 8) - 1] = i;
-		}
+		if (i >= 0x00 && i <= 0x7F)
+			str = ft_strjoin_char(str, i);
 		else
-			exit (0);
-		if (i == 0)
+			exit(0);
+		if (i == 0 || ft_strlen(str) > 1000)
 		{
 			ft_printf("%s\n", str);
 			str = NULL;
 			free(str);
-			(*bit_len) = 0;
 		}
-		(*bit) = 0;
+		bit = 0;
 		i = 0;
 	}
+	(usleep(50), kill(info->si_pid, SIGUSR2));
 }
 
 int	main(void)
@@ -79,14 +82,14 @@ int	main(void)
 	struct sigaction	s_sigaction;
 
 	pid = getpid();
-	ft_printf("%d\n", pid);
-	s_sigaction.sa_sigaction = ft_reception;
+	ft_printf("PID : %d\n", pid);
+	s_sigaction.sa_sigaction = sigusr;
 	s_sigaction.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &s_sigaction, 0);
 	sigaction(SIGUSR2, &s_sigaction, 0);
 	while (1)
 	{
-		pause();
+		usleep(1);
 	}
 	return (0);
 }

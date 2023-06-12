@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aabel <aabel@student.42.fr>                +#+  +:+       +#+        */
+/*   By: arthurabel <arthurabel@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/09 10:38:14 by aabel             #+#    #+#             */
-/*   Updated: 2022/11/09 13:16:03 by aabel            ###   ########.fr       */
+/*   Updated: 2023/05/31 16:59:32 by arthurabel       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,9 +42,7 @@ char	*ft_itoa(int n)
 	char			*x;
 	long int		len;
 	unsigned int	num;
-	int				sign;
 
-	sign = 1;
 	len = ft_len(n);
 	x = malloc(sizeof(char) * (len + 1));
 	if (!x)
@@ -54,7 +52,6 @@ char	*ft_itoa(int n)
 		x[0] = '0';
 	if (n < 0)
 	{
-		sign *= -1;
 		num = n * -1;
 		x[0] = '-';
 	}
